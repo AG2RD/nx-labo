@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "defaultProject": "nx-ci-app",
+  "schematics": {
+    "@nrwl/angular": {
+      "application": {
+        "linter": "eslint"
+      },
+      "library": {
+        "linter": "eslint"
+      },
+      "storybook-configuration": {
+        "linter": "eslint"
+      }
+    },
+    "@nrwl/angular:application": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest"
+    },
+    "@nrwl/angular:component": {
+      "style": "scss"
+    }
+  },
+  "projects": {
+    "nx-ci-app": {
+      "projectType": "application",
+      "root": "apps/nx-ci-app",
+      "sourceRoot": "apps/nx-ci-app/src",
+      "prefix": "nx-ci-ws",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/nx-ci-app",
+            "index": "apps/nx-ci-app/src/index.html",
+            "main": "apps/nx-ci-app/src/main.ts",
+            "polyfills": "apps/nx-ci-app/src/polyfills.ts",
+            "tsConfig": "apps/nx-ci-app/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "apps/nx-ci-app/src/favicon.ico",
+              "apps/nx-ci-app/src/assets"
+            ],
+            "styles": ["apps/nx-ci-app/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/nx-ci-app/src/environments/environment.ts",
+                  "with": "apps/nx-ci-app/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "nx-ci-app:build:production"
+            },
+            "development": {
+              "browserTarget": "nx-ci-app:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "nx-ci-app:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/nx-ci-app/src/**/*.ts",
+              "apps/nx-ci-app/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/nx-ci-app"],
+          "options": {
+            "jestConfig": "apps/nx-ci-app/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "nx-ci-app-e2e": {
+      "root": "apps/nx-ci-app-e2e",
+      "sourceRoot": "apps/nx-ci-app-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/nx-ci-app-e2e/cypress.json",
+            "tsConfig": "apps/nx-ci-app-e2e/tsconfig.e2e.json",
+            "devServerTarget": "nx-ci-app:serve:development"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "nx-ci-app:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/nx-ci-app-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
+    }
+  }
+}
